@@ -6,3 +6,10 @@
 /* El foco inicial anuncia la portada sin dibujar un marco alrededor de la sección. */
 #inicio:focus{outline:none}
 .event-icon svg{width:35px;height:35px;stroke:currentColor;fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round}
+/* Nombres de la pareja: conservar proporción editorial con nombres más largos. */
+.hero-copy .couple-names{font-size:clamp(70px,7.3vw,116px);letter-spacing:-3px;line-height:.95}
+.letter-names{font-size:32px}
+.direction-icon{display:inline-block;width:20px;height:20px;vertical-align:middle;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.header-actions{position:relative}
+.audio-status{position:absolute;right:0;top:45px;width:220px;background:var(--paper);border:1px solid var(--line);padding:10px 14px;font-size:10px;letter-spacing:0;line-height:1.5;z-index:10;box-shadow:0 5px 15px #293c3210}
+@media(max-width:700px){.hero-copy .couple-names{font-size:clamp(58px,16vw,90px);line-height:.95;letter-spacing:-2px}.hero-copy .couple-names br{display:block}.letter-names{font-size:27px}}

@@ -14,7 +14,7 @@ Abre `index.html` directamente o utiliza un servidor estático (por ejemplo, Liv
 
 ## Adaptar a una pareja
 
-1. Edita nombres, iniciales, fecha visible, ciudad, horarios, fecha límite y textos en `index.html`. Busca Sofía, Carlos, 2027 y San Miguel. Edita también el título y la descripción del documento.
+1. Edita nombres, iniciales, fecha visible, ciudad, horarios, fecha límite y textos en `index.html`. Busca Emmanuel, Estacy, 2027 y San Miguel. Edita también el título y la descripción del documento.
 2. Actualiza `couple`, `date` y `endDate` en `config.js`. Incluye el desfase horario correcto; el ejemplo utiliza UTC−06:00. La cuenta regresiva y el archivo de calendario utilizan estas fechas. Las fechas visibles/editoriales del HTML deben coincidir.
 3. Sustituye las fotografías desde `photos`, conservando sus claves. Actualiza también los atributos `src` y `alt` del HTML para la presentación sin JS y el contenido accesible. Las imágenes de los lugares son inspiración, NO fotografías verificadas de los lugares nombrados.
 4. Actualiza nombres, direcciones y búsquedas de los lugares en `ceremony` y `reception`; ajusta además las etiquetas de ciudad e itinerario del HTML.
@@ -34,7 +34,9 @@ Los parámetros URL son presentación editable por el visitante: **no son contro
 
 ## Música
 
-La versión entregada sintetiza una secuencia original suave con Web Audio tras abrir el sobre. No usa grabaciones de terceros. El control superior permite pausarla/reanudarla. Para una pista definitiva, carga un archivo con derechos de uso y configura `audio.url`, por ejemplo `assets/nuestra-cancion.mp3`. El audio nunca se inicia antes de una interacción del visitante.
+La versión entregada reproduce `assets/atelier-nocturne.mp3`, una grabación de la misma secuencia original, con el elemento HTML `<audio>`. Se inicia directamente al tocar el sello; el botón superior pausa o reanuda. El indicador sigue los eventos reales de reproducción. Si el navegador bloquea el inicio, aparece una indicación para tocar el botón. No se puede forzar el volumen del sistema ni garantizar reproducción sin interacción.
+
+Para otra pista, usa un archivo autorizado en `audio.url`. La melodía original puede regenerarse con `scripts/render-audio.py` en el repositorio y codificarse a MP3 mediante ffmpeg.
 
 ## Funciones incluidas
 
@@ -61,7 +63,7 @@ Fotografías de muestra de Unsplash, identificadores originales conservados como
 - https://images.unsplash.com/photo-1595777457583-95e059d581b8 (vestido)
 - https://images.unsplash.com/photo-1594938298603-c8148c4dae35 (traje)
 
-Reemplaza estas fotografías por las de la misma pareja para una entrega comercial coherente; son referencias visuales y no representan una boda real de Sofía y Carlos. Usa material que el cliente te autorice. Fuentes: Cormorant Garamond y Manrope mediante Google Fonts. No se incluyen analítica, almacenamiento de datos del formulario ni cookies propias.
+Reemplaza estas fotografías por las de la misma pareja para una entrega comercial coherente; son referencias visuales y no representan una boda real de Emmanuel y Estacy. Usa material que el cliente te autorice. Fuentes: Cormorant Garamond y Manrope mediante Google Fonts. No se incluyen analítica, almacenamiento de datos del formulario ni cookies propias.
 
 ## Despliegue
 

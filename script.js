@@ -20,34 +20,49 @@ for (const key of ['ceremony','reception']) {
  $(key+'-waze').href='https://waze.com/ul?q='+encodeURIComponent(place.query)+'&navigate=yes';
 }
 $('map').src='https://maps.google.com/maps?q='+encodeURIComponent(C.ceremony.query)+'&output=embed';
-// Un pequeño nocturno original sintetizado; no depende de un enlace de audio externo.
-let audioContext, master, sequenceTimer, isPlaying=false, audioFile;
-const melody=[60,64,67,71,69,67,64,62,57,60,64,67,65,64,60,59,53,57,60,64,62,60,57,55,55,59,62,67,65,62,59,62];
-function playPhrase(){
- const start=audioContext.currentTime+.05;
- melody.forEach((note,i)=>{
-  const time=start+i*.75,osc=audioContext.createOscillator(),gain=audioContext.createGain();
-  osc.type='sine';osc.frequency.value=440*Math.pow(2,(note-69)/12);
-  gain.gain.setValueAtTime(0,time);gain.gain.linearRampToValueAtTime(.18,time+.025);gain.gain.exponentialRampToValueAtTime(.001,time+2.6);
-  osc.connect(gain);gain.connect(master);osc.start(time);osc.stop(time+2.8);
+// Archivo MP3 local: reproducción nativa en Safari, sin depender de AudioContext.
+const audioFile = $('wedding-audio');
+if (C.audio.url) audioFile.src = C.audio.url;
+audioFile.volume = Math.max(0, Math.min(1, C.audio.volume ?? 0.65));
+let playRequested = false;
+function updateSound(playing) {
+ $('sound').classList.toggle('playing', playing);
+ $('sound').setAttribute('aria-pressed', String(playing));
+ $('sound').setAttribute('aria-label', playing ? 'Pausar música' : 'Activar música');
+}
+function audioNotice(message = '') {
+ $('audio-status').textContent = message;
+ $('audio-status').hidden = !message;
+}
+function startSound() {
+ playRequested = true;
+ audioNotice();
+ // play() se llama directamente desde el gesto; no después de un timer ni de await.
+ const attempt = audioFile.play();
+ if (attempt) attempt.catch(error => {
+  if (error.name === 'AbortError') return;
+  playRequested = false;
+  updateSound(false);
+  audioNotice('Toca el botón de música para escuchar.');
  });
 }
-function updateSound(){ $('sound').classList.toggle('playing',isPlaying);$('sound').setAttribute('aria-pressed',String(isPlaying));$('sound').setAttribute('aria-label',isPlaying?'Pausar música':'Activar música'); }
-async function toggleSound(){
- try{
-  if(C.audio.url){audioFile ||= Object.assign(new Audio(C.audio.url),{loop:true,volume:C.audio.volume});if(isPlaying)audioFile.pause();else await audioFile.play();}
-  else {
-   if(!audioContext){audioContext=new (window.AudioContext||window.webkitAudioContext)();master=audioContext.createGain();master.gain.value=C.audio.volume;master.connect(audioContext.destination);playPhrase();sequenceTimer=setInterval(()=>{if(audioContext.state==='running')playPhrase();},24000);}
-   if(isPlaying)await audioContext.suspend();else await audioContext.resume();
-  }
-  isPlaying=!isPlaying;updateSound();
- }catch{isPlaying=false;updateSound();$('sound').setAttribute('aria-label','Audio no disponible; toca para reintentar');}
+function toggleSound() {
+ if (playRequested || !audioFile.paused) {
+  playRequested = false;
+  audioFile.pause();
+  updateSound(false);
+  audioNotice();
+ } else startSound();
 }
-$('sound').addEventListener('click',toggleSound);
+audioFile.addEventListener('playing', () => { playRequested = true; updateSound(true); audioNotice(); });
+audioFile.addEventListener('pause', () => { playRequested = false; updateSound(false); });
+audioFile.addEventListener('waiting', () => { updateSound(false); audioNotice('Cargando música…'); });
+audioFile.addEventListener('error', () => { playRequested = false; updateSound(false); audioNotice('No se pudo cargar la música. Toca para reintentar.'); });
+$('sound').addEventListener('click', toggleSound);
 // Apertura accesible: el contenido queda fuera del foco hasta terminar la animación.
 document.body.classList.add('locked');$('site').inert=true;
 $('open-invitation').addEventListener('click',()=>{
- $('open-invitation').disabled=true;$('welcome').classList.add('opening');toggleSound();
+ $('open-invitation').disabled=true;$('welcome').classList.add('opening');startSound();
  setTimeout(()=>{$('welcome').classList.add('dismissed');$('site').inert=false;document.body.classList.remove('locked');$('inicio').setAttribute('tabindex','-1');$('inicio').focus({preventScroll:true});setTimeout(()=>$('welcome').hidden=true,850);},reduceMotion?0:1850);
 });
 $('open-invitation').focus({preventScroll:true});
@@ -67,8 +82,8 @@ if(!reduceMotion){let pending=false;addEventListener('scroll',()=>{if(pending)re
 function icsDate(date){return new Date(date).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');}
 function icsEscape(text){return text.replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');}
 $('calendar').addEventListener('click',()=>{
- const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Atelier//Wedding//ES','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:sofia-carlos-${icsDate(C.date)}@atelier.local`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${icsDate(C.date)}`,`DTEND:${icsDate(C.endDate)}`,`SUMMARY:${icsEscape('Boda de '+C.couple)}`,`LOCATION:${icsEscape(C.ceremony.name+', '+C.ceremony.address)}`,`DESCRIPTION:${icsEscape('Ceremonia y celebración. Recepción: '+C.reception.name+'. '+C.reception.address)}`,'END:VEVENT','END:VCALENDAR'];
- const url=URL.createObjectURL(new Blob([lines.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Sofia-y-Carlos.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
+ const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Atelier//Wedding//ES','CALSCALE:GREGORIAN','BEGIN:VEVENT',`UID:emmanuel-estacy-${icsDate(C.date)}@atelier.local`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${icsDate(C.date)}`,`DTEND:${icsDate(C.endDate)}`,`SUMMARY:${icsEscape('Boda de '+C.couple)}`,`LOCATION:${icsEscape(C.ceremony.name+', '+C.ceremony.address)}`,`DESCRIPTION:${icsEscape('Ceremonia y celebración. Recepción: '+C.reception.name+'. '+C.reception.address)}`,'END:VEVENT','END:VCALENDAR'];
+ const url=URL.createObjectURL(new Blob([lines.join('\r\n')+'\r\n'],{type:'text/calendar;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='Emmanuel-y-Estacy.ics';a.click();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
 document.querySelectorAll('.swatches button').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.swatches button').forEach(b=>b.setAttribute('aria-pressed','false'));button.setAttribute('aria-pressed','true');$('color-name').textContent=button.dataset.color;}));
 const gallery=[...document.querySelectorAll('.gallery-item')];let activePhoto=0;
@@ -77,7 +92,7 @@ gallery.forEach((button,i)=>button.addEventListener('click',()=>{showPhoto(i);$(
 $('close-lightbox').addEventListener('click',()=>$('lightbox').close());$('previous-photo').addEventListener('click',()=>showPhoto(activePhoto-1));$('next-photo').addEventListener('click',()=>showPhoto(activePhoto+1));
 $('lightbox').addEventListener('keydown',e=>{if(e.key==='ArrowRight')showPhoto(activePhoto+1);if(e.key==='ArrowLeft')showPhoto(activePhoto-1);});
 $('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox'))$('lightbox').close();});
-C.registries.forEach(registry=>{const valid=/^https:\/\//.test(registry.url);const element=document.createElement(valid?'a':'button');if(valid){element.href=registry.url;element.target='_blank';element.rel='noopener';}else{element.type='button';element.addEventListener('click',()=>{element.querySelector('small').textContent='LISTA DE DEMOSTRACIÓN · ENLACE PENDIENTE';});}const title=document.createElement('strong'),label=document.createElement('small');title.textContent=registry.name;label.textContent=registry.label+' ↗';element.append(title,label);$('gift-links').append(element);});
+C.registries.forEach(registry=>{const valid=/^https:\/\//.test(registry.url);const element=document.createElement(valid?'a':'button');if(valid){element.href=registry.url;element.target='_blank';element.rel='noopener';}else{element.type='button';element.addEventListener('click',()=>{element.querySelector('small').textContent='LISTA DE DEMOSTRACIÓN · ENLACE PENDIENTE';});}const title=document.createElement('strong'),label=document.createElement('small');title.textContent=registry.name;label.textContent=registry.label+'';element.append(title,label);$('gift-links').append(element);});
 const validBank=/^\d{18}$/.test(C.bank.clabe);
 $('bank-details').textContent=validBank?`${C.bank.name} · ${C.bank.holder}`:'Los datos bancarios se compartirán aquí cuando estén disponibles.';
 $('clabe').textContent=validBank?C.bank.clabe:'— — —';$('copy-clabe').disabled=!validBank;

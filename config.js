@@ -13,8 +13,8 @@ window.WEDDING_CONFIG = {
   // Pega los enlaces específicos de las mesas. Vacíos se muestran como pendientes.
   registries: [{name:'Liverpool',label:'MESA DE REGALOS',url:''},{name:'Palacio de Hierro',label:'MESA DE REGALOS',url:''},{name:'Amazon',label:'NUESTRA LISTA',url:''}],
   bank: {holder:'',name:'',clabe:''},
-  // Opcional: URL o archivo propio con licencia. Sin URL se genera una melodía original.
-  audio: {url:'',volume:0.18},
+  // Opcional: URL o archivo propio con licencia. Sin URL se utiliza la melodía original incluida.
+  audio: {url:'assets/atelier-nocturne.mp3',volume:0.65},
   photos: {
     hero:'assets/novios_01.jpeg',
     story:'assets/novios_02.jpeg',
