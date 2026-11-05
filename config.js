@@ -1,7 +1,7 @@
 /* Configuración central. No coloques información privada: este archivo es público.
    Los textos editoriales adicionales se pueden editar directamente en index.html. */
 window.WEDDING_CONFIG = {
-  couple: 'Sofía & Carlos',
+  couple: 'Emmanuel & Estacy',
   date: '2027-06-12T16:30:00-06:00',
   endDate: '2027-06-13T02:00:00-06:00',
   // Número internacional, solo dígitos (México: 52 + 10 dígitos). Vacío = demo segura.
